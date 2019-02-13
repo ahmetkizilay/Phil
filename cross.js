@@ -14,19 +14,17 @@
 // ------------------------------------------------------------------------
 
 const keyboard = {
-  "a":      65, "b": 66, "c": 67, "d": 68, "e": 69, "f": 70, "g": 71, "h": 72,
-  "i":      73, "j": 74, "k": 75, "l": 76, "m": 77, "n": 78, "o": 79, "p": 80,
-  "q":      81, "r": 82, "s": 83, "t": 84, "u": 85, "v": 86, "w": 87, "x": 88, "y": 89,
-  "z":      90,
-  "black":  190, ".": 190,
-  "delete": 8,
-  "enter":  13,
-  "space":  32,
-  "left":   37,
-  "up":     38,
-  "right":  39,
-  "down":   40
+  'black':  '.',
+  'delete': 'Delete',
+  'backspace': 'Backspace',
+  'enter':  'Enter',
+  'space':  ' ',
+  'left':   'ArrowLeft',
+  'up':     'ArrowUp',
+  'right':  'ArrowRight',
+  'down':   'ArrowDown',
 };
+const keyboardLetterMatch = /^[\wığüşöçĞÜŞÖÇİ]$/i;
 const BLACK = ".";
 const DASH = "-";
 const BLANK = " ";
@@ -345,9 +343,10 @@ function keyboardHandler(e) {
   const symRow = xw.rows - 1 - current.row;
   const symCol = xw.cols - 1 - current.col;
 
-  if ((e.which >= keyboard.a && e.which <= keyboard.z) || e.which == keyboard.space) {
+  if (e.key.match(keyboardLetterMatch) || e.key == ' ') {
+    
     let oldContent = xw.fill[current.row][current.col];
-    xw.fill[current.row] = xw.fill[current.row].slice(0, current.col) + String.fromCharCode(e.which) + xw.fill[current.row].slice(current.col + 1);
+    xw.fill[current.row] = xw.fill[current.row].slice(0, current.col) + e.key + xw.fill[current.row].slice(current.col + 1);
     if (oldContent == BLACK) {
       if (isSymmetrical) {
         xw.fill[symRow] = xw.fill[symRow].slice(0, symCol) + BLANK + xw.fill[symRow].slice(symCol + 1);
@@ -356,16 +355,16 @@ function keyboardHandler(e) {
     // move the cursor
     e = new Event('keydown');
     if (current.direction == ACROSS) {
-      e.which = keyboard.right;
+      e.key = keyboard.right;
     } else {
-      e.which = keyboard.down;
+      e.key = keyboard.down;
     }
     isMutated = true;
   }
-  if (e.which == keyboard.black) {
+  if (e.key == keyboard.black) {
       if (xw.fill[current.row][current.col] == BLACK) { // if already black...
         e = new Event('keydown');
-        e.which = keyboard.delete; // make it a white square
+        e.key = keyboard.delete; // make it a white square
       } else {
         xw.fill[current.row] = xw.fill[current.row].slice(0, current.col) + BLACK + xw.fill[current.row].slice(current.col + 1);
         if (isSymmetrical) {
@@ -374,10 +373,10 @@ function keyboardHandler(e) {
       }
       isMutated = true;
   }
-  if (e.which == keyboard.enter) {
+  if (e.key == keyboard.enter) {
       current.direction = (current.direction == ACROSS) ? DOWN : ACROSS;
   }
-  if (e.which == keyboard.delete) {
+  if (e.key == keyboard.delete || e.key === keyboard.backspace) {
     e.preventDefault();
     let oldContent = xw.fill[current.row][current.col];
     xw.fill[current.row] = xw.fill[current.row].slice(0, current.col) + BLANK + xw.fill[current.row].slice(current.col + 1);
@@ -388,19 +387,19 @@ function keyboardHandler(e) {
       } else { // move the cursor
         e = new Event('keydown');
         if (current.direction == ACROSS) {
-          e.which = keyboard.left;
+          e.key = keyboard.left;
         } else {
-          e.which = keyboard.up;
+          e.key = keyboard.up;
         }
       }
       isMutated = true;
   }
-  if (e.which >= keyboard.left && e.which <= keyboard.down) {
+  if (e.key === keyboard.left || e.key === keyboard.right || e.key === keyboard.down || e.key === keyboard.up) {
       e.preventDefault();
       const previousCell = grid.querySelector('[data-row="' + current.row + '"]').querySelector('[data-col="' + current.col + '"]');
       previousCell.classList.remove("active");
       let content = xw.fill[current.row][current.col];
-      switch (e.which) {
+      switch (e.key) {
         case keyboard.left:
           if (current.direction == ACROSS || content == BLACK) {
             current.col -= (current.col == 0) ? 0 : 1;
@@ -671,7 +670,7 @@ function setAuthor() {
 }
 
 function suppressEnterKey(e) {
-  if (e.which == keyboard.enter) {
+  if (e.key == keyboard.enter) {
     e.preventDefault();
     // console.log("Enter key behavior suppressed.");
   }
