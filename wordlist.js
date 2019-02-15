@@ -13,6 +13,37 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+function convertToLower(letter) {
+  switch(letter) {
+    case 'I':
+      return 'ı';
+    case 'İ':
+      return 'i';
+    default:
+      return letter;
+  }
+}
+
+function convertToUpper(letter) {
+  switch(letter) {
+    case 'ı':
+      return 'I';
+    case 'i':
+      return 'İ';
+    default:
+      return letter;
+  }
+}
+
+function toLowerCase(word) {
+  const letters = word.split('');
+  return letters.map(l => convertToLower(l)).join('');
+}
+function toUpperCase(word) {
+  const letters = word.split('');
+  return letters.map(l => convertToUpper(l)).join('');
+}
+
 let wordlist = [
   [], [], [], [], [],
   [], [], [], [], [],
@@ -26,7 +57,7 @@ openDefaultWordlist("https://raw.githubusercontent.com/keiranking/Phil/master/WL
 
 function addToWordlist(newWords) {
   for (i = 0; i < newWords.length; i++) {
-    const word = newWords[i].trim().toUpperCase();
+    const word = toUpperCase(newWords[i].trim());
     if (word.length < wordlist.length) { // Make sure we don't access outside the wordlist array
       wordlist[word.length].push(word);
     }
@@ -95,7 +126,7 @@ function matchFromWordlist(word) {
   const l = word.length;
   const actualLettersInWord = word.replace(/-/g, "").length;
   if (actualLettersInWord >= 1 && actualLettersInWord < l) { // Only search if word isn't completely blank or filled
-    word = word.split(DASH).join("\\w");
+    word = toUpperCase(word).split(DASH).join("\[\\wĞÜŞÖÇİ\]");
     const pattern = new RegExp(word);
     let matches = [];
     for (let i = 0; i < wordlist[l].length; i++) {
@@ -113,12 +144,12 @@ function updateMatchesUI() {
   let acrossMatchList = document.getElementById("across-matches");
   let downMatchList = document.getElementById("down-matches");
   acrossMatchList.innerHTML = "";
-  downMatchList.innerHTML = "";
+  downMatchList.innerHTML = "";  
   const acrossMatches = matchFromWordlist(current.acrossWord);
   const downMatches = matchFromWordlist(current.downWord);
   for (i = 0; i < acrossMatches.length; i++) {
     let li = document.createElement("LI");
-    li.innerHTML = acrossMatches[i].toLowerCase();
+    li.innerHTML = toLowerCase(acrossMatches[i]);
     li.className = "";
     // li.addEventListener('click', printScore);
     li.addEventListener('dblclick', fillGridWithMatch);
@@ -126,7 +157,7 @@ function updateMatchesUI() {
   }
   for (i = 0; i < downMatches.length; i++) {
     let li = document.createElement("LI");
-    li.innerHTML = downMatches[i].toLowerCase();
+    li.innerHTML = toLowerCase(downMatches[i]);
     li.className = "";
     li.addEventListener('dblclick', fillGridWithMatch);
     downMatchList.appendChild(li);
@@ -135,7 +166,7 @@ function updateMatchesUI() {
 
 function fillGridWithMatch(e) {
   const li = e.currentTarget;
-  const fill = li.innerHTML.toUpperCase();
+  const fill = toUpperCase(li.innerHTML);
   const dir = (li.parentNode.id == "across-matches") ? ACROSS : DOWN;
 
   if (dir == ACROSS) {
