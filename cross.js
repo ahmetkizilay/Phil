@@ -269,7 +269,11 @@ new Notification(document.getElementById("shortcuts").innerHTML, 300);
 // new Notification("Tip: <kbd>.</kbd> makes a black square.", 300);
 // new Notification("Tip: <kbd>Enter</kbd> toggles direction.", 300);
 
-let xw = new Crossword(); // model
+var searchParams = new URLSearchParams(window.location.search);
+const urlRows = searchParams.has('r') ? Number(searchParams.get('r')) : 15;
+const urlCols = searchParams.has('c') ? Number(searchParams.get('c')) : 15;
+
+let xw = new Crossword(urlRows, urlCols); // model
 let current = new Interface(xw.rows, xw.cols); // view-controller
 current.update();
 
